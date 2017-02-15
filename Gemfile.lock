@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ipa_analyzer (0.1.0)
+    ipa_analyzer (0.1.1)
       plist (~> 3.1, >= 3.1.0)
       rubyzip (~> 1.1.7, >= 1.1.7)
 
@@ -9,7 +9,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
-    plist (3.1.0)
+    plist (3.2.0)
     rake (10.4.2)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
@@ -33,3 +33,6 @@ DEPENDENCIES
   ipa_analyzer!
   rake
   rspec
+
+BUNDLED WITH
+   1.14.3
