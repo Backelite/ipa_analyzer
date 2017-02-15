@@ -96,7 +96,7 @@ module IpaAnalyzer
         command_to_execute = nil
         error_message = nil
         if OS.linux?
-          command_to_execute = "listutil -convert xml1 -i '#{tempfile.path}' > #{decoded_tmp.path}"
+          command_to_execute = "plistutil -convert xml1 -i '#{tempfile.path}' > #{decoded_tmp.path}"
           error_message = 'plistutil failed to execute. Is plistutil installed on your system? If not use apt-get install libplist-utils'
         elsif OS.macos?
           command_to_execute = "plutil -convert xml1 '#{tempfile.path}'"
