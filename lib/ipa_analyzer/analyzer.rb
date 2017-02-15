@@ -2,6 +2,7 @@ require 'tempfile'
 require 'zip'
 require 'zip/filesystem'
 require 'plist'
+require_relative 'os'
 
 module IpaAnalyzer
   class Analyzer
@@ -41,7 +42,10 @@ module IpaAnalyzer
       tempfile = Tempfile.new(::File.basename(mobileprovision_entry.name))
       begin
         @ipa_zipfile.extract(mobileprovision_entry, tempfile.path) { override = true }
-        plist = Plist.parse_xml(`security cms -D -i #{tempfile.path}`)
+        # plist = Plist.parse_xml(`security cms -D -i #{tempfile.path}`)
+
+        # 2> /dev/null redirects openssl second output stream to somewhere else so we dont get it in the main os
+        plist = Plist.parse_xml(`openssl smime -inform der -verify -noverify -in #{tempfile.path} 2> /dev/null`)
 
         plist.each do |key, value|
           next if key == 'DeveloperCertificates'
@@ -85,13 +89,25 @@ module IpaAnalyzer
       result[:path_in_ipa] = info_plist_entry.to_s
 
       tempfile = Tempfile.new(::File.basename(info_plist_entry.name))
+      decoded_tmp = Tempfile.new(::File.basename(info_plist_entry.name + '.tmp'))
       begin
         @ipa_zipfile.extract(info_plist_entry, tempfile.path) { override = true }
         # convert from binary Plist to XML Plist
-        unless system("plutil -convert xml1 '#{tempfile.path}'")
+        command_to_execute = nil
+        error_message = nil
+        if OS.linux?
+          command_to_execute = "listutil -convert xml1 -i '#{tempfile.path}' > #{decoded_tmp.path}"
+          error_message = 'plistutil failed to execute. Is plistutil installed on your system? If not use apt-get install libplist-utils'
+        elsif OS.macos?
+          command_to_execute = "plutil -convert xml1 '#{tempfile.path}'"
+        end
+        unless system(command_to_execute)
+          vputs error_message unless error_message.nil?
           raise 'Failed to convert binary Plist to XML'
         end
-        plist = Plist.parse_xml(tempfile.path)
+        puts "Finish executing plistutil conversion to XML: #{File.read(decoded_tmp.path)}"
+        plist = Plist.parse_xml(decoded_tmp.path)
+        puts "Parsed XML content: #{plist.inspect}"
 
         plist.each do |key, value|
           parse_value = nil
