@@ -1,8 +1,7 @@
 require 'tempfile'
 require 'zip'
 require 'zip/filesystem'
-require 'plist'
-require_relative 'os'
+require 'cfpropertylist'
 
 module IpaAnalyzer
   class Analyzer
@@ -13,8 +12,12 @@ module IpaAnalyzer
     end
 
     def open!
-      @ipa_zipfile = Zip::File.open(@ipa_path)
-      @app_folder_path = find_app_folder_in_ipa
+      begin
+        @ipa_zipfile = Zip::File.open(@ipa_path)
+        @app_folder_path = find_app_folder_in_ipa
+      rescue => e
+        raise 'File is not a valid IPA'
+      end
       raise 'No app folder found in the IPA' if @app_folder_path.nil?
     end
 
@@ -42,14 +45,12 @@ module IpaAnalyzer
       tempfile = Tempfile.new(::File.basename(mobileprovision_entry.name))
       begin
         @ipa_zipfile.extract(mobileprovision_entry, tempfile.path) { override = true }
-        # plist = Plist.parse_xml(`security cms -D -i #{tempfile.path}`)
-
-        # 2> /dev/null redirects openssl second output stream to somewhere else so we dont get it in the main os
-        plist = Plist.parse_xml(`openssl smime -inform der -verify -noverify -in #{tempfile.path} 2> /dev/null`)
-
+        # 2> /dev/null redirects openssl second output stream to somewhere else so we dont get it in the main output stream
+        plist_as_xml = `openssl smime -inform der -verify -noverify -in #{tempfile.path} 2> /dev/null`
+        data = CFPropertyList::List.new(data: plist_as_xml)
+        plist = CFPropertyList.native_types(data.value)
         plist.each do |key, value|
           next if key == 'DeveloperCertificates'
-
           parse_value = nil
           parse_value = case value
                         when Hash
@@ -84,31 +85,15 @@ module IpaAnalyzer
         content: {}
       }
       info_plist_entry = @ipa_zipfile.find_entry(filename)
-
       raise "File 'Info.plist' not found in #{@ipa_path}" unless info_plist_entry
-      result[:path_in_ipa] = info_plist_entry.to_s
 
+      result[:path_in_ipa] = info_plist_entry.to_s
       tempfile = Tempfile.new(::File.basename(info_plist_entry.name))
-      decoded_tmp = Tempfile.new(::File.basename(info_plist_entry.name + '.tmp'))
       begin
         @ipa_zipfile.extract(info_plist_entry, tempfile.path) { override = true }
         # convert from binary Plist to XML Plist
-        command_to_execute = nil
-        error_message = nil
-        if OS.linux?
-          command_to_execute = "plistutil -convert xml1 -i '#{tempfile.path}' > #{decoded_tmp.path}"
-          error_message = 'plistutil failed to execute. Is plistutil installed on your system? If not use apt-get install libplist-utils'
-        elsif OS.macos?
-          command_to_execute = "plutil -convert xml1 '#{tempfile.path}'"
-        end
-        unless system(command_to_execute)
-          vputs error_message unless error_message.nil?
-          raise 'Failed to convert binary Plist to XML'
-        end
-        puts "Finish executing plistutil conversion to XML: #{File.read(decoded_tmp.path)}"
-        plist = Plist.parse_xml(decoded_tmp.path)
-        puts "Parsed XML content: #{plist.inspect}"
-
+        plist_object = CFPropertyList::List.new(file: tempfile.path)
+        plist = CFPropertyList.native_types(plist_object.value)
         plist.each do |key, value|
           parse_value = nil
           parse_value = case value
