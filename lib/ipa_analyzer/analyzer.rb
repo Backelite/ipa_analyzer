@@ -144,7 +144,6 @@ module IpaAnalyzer
         }
         result[:content].push(fwk_info)
       end
-
       result
     end
 
@@ -162,8 +161,6 @@ module IpaAnalyzer
         result = collect_info_plist_info_with_path("#{path}Entitlements.plist")
       elsif !@ipa_zipfile.find_entry("#{path}archived-expanded-entitlements.xcent").nil?
         result = collect_info_plist_info_with_path("#{path}archived-expanded-entitlements.xcent")
-      else
-        vputs 'INFO: No entitlements found'
       end
 
       result
@@ -181,7 +178,6 @@ module IpaAnalyzer
       raise 'IPA is not open' unless open?
 
       search_path = "#{path}*#{extension}"
-      vputs(" * Collecting info.plist, mobileprovision and entitlements from #{search_path}")
       watch_entries = @ipa_zipfile.glob(search_path)
 
       return nil if watch_entries.nil? || watch_entries.length.zero?
@@ -244,5 +240,6 @@ module IpaAnalyzer
       end
       nil
     end
+
   end
 end
