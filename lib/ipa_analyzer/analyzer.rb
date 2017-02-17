@@ -89,7 +89,6 @@ module IpaAnalyzer
         content: {}
       }
       info_plist_entry = @ipa_zipfile.find_entry(path)
-      info_plist_entry = @ipa_zipfile.find_entry(path)
       raise "File 'Info.plist' not found in #{@ipa_path}" unless info_plist_entry
 
       result[:path_in_ipa] = info_plist_entry.to_s
