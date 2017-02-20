@@ -2,9 +2,8 @@
 
 iOS IPA file analyzer.
 
-Can be used directly in Ruby projects (it requires OS X as it's platform
-to perform Plist file conversions!) or as a CLI in your Command Line / Terminal.
-
+Can be used directly in Ruby projects or as a CLI in your Command Line / Terminal. 
+It currently requires Linux or macOS due to dependencies on OpenSSL.
 
 You can use this GEM by adding it to your Gemfile:
 
@@ -24,6 +23,7 @@ If used as a CLI:
 
 This will collect and print:
 * the embedded mobileprovisioning,
+* information about the certificate embedded into the mobile provisioning (as a child object of mobileprovision content),
 * the Info.plist, 
 * the entitlements (from the Entitlements.plist or archived-expanded-entitlements.xcent files) if any,
 * the list of frameworks and their Info.plist if any
@@ -44,6 +44,12 @@ The output of this command looks like this:
             "XXXA8V3XXX"
           ],
           "CreationDate": "2014-05-10T11:57:32+00:00",
+          "cert_info": {
+            "issuer_raw": "subject= /UID=XXXXXXXXXX/CN=iPhone Distribution: COMPANY (XXXXXXXXXX)/OU=XXXXXXXXXX/O=COMPANY/C=US\n",
+            "cn": "iPhone Distribution: COMPANY (XXXXXXXXXX)",
+            "uid": "XXXXXXXXXX",
+            "org": "COMPANY"
+          },
           "Entitlements": {
             "application-identifier": "XXXA8V3XXX.*",
             "get-task-allow": true,
@@ -642,4 +648,4 @@ The output of this command looks like this:
 
 ## Requirements
 
-* OS: OS X (tested on 10.10 Yosemite)
+* OS: OS X (tested on 10.10 Yosemite) or Linux (tested on Ubuntu LTS 15.04)
