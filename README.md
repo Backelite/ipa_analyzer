@@ -2,8 +2,8 @@
 
 iOS IPA file analyzer.
 
-Can be used directly in Ruby projects (it requires OS X as it's platform
-to perform Plist file conversions!) or as a CLI in your Command Line / Terminal.
+Can be used directly in Ruby projects or as a CLI in your Command Line / Terminal.
+It currently requires Linux or macOS due to dependencies on OpenSSL.
 
 
 You can use this GEM by adding it to your Gemfile:
@@ -114,4 +114,4 @@ The output of this command looks like this:
 
 ## Requirements
 
-* OS: OS X (tested on 10.10 Yosemite)
+* OS: OS X (tested on 10.10 Yosemite) or Linux (tested on Ubuntu LTS 15.04)
