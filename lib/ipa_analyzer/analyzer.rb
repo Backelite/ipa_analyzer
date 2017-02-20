@@ -53,7 +53,7 @@ module IpaAnalyzer
         uid: nil,
         org: nil
       }
-      data_as_hex = base64data.first.string.each_byte.map { |b| b.to_s(16).rjust(2,'0') }.join
+      data_as_hex = base64data.first.each_byte.map { |b| b.to_s(16).rjust(2,'0') }.join
       subject = `echo #{data_as_hex} | xxd -r -p | openssl x509 -inform DER -noout -subject`
       result[:issuer_raw] = subject
       result[:cn] = cert_issuer_extract_common_name(subject)
