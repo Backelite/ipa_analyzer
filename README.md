@@ -13,7 +13,8 @@ Or install it as a system-wide GEM / CLI:
 
     gem install ipa_analyzer
 
-
+Please review the requirements section at the bottom of this file if you 
+experience issues with the software.
 
 ## Usage example
 
@@ -45,7 +46,7 @@ The output of this command looks like this:
           ],
           "CreationDate": "2014-05-10T11:57:32+00:00",
           "cert_info": {
-            "issuer_raw": "subject= /UID=XXXXXXXXXX/CN=iPhone Distribution: COMPANY (XXXXXXXXXX)/OU=XXXXXXXXXX/O=COMPANY/C=US\n",
+            "issuer_raw": "subject= UID=XXXXXXXXXX, CN=iPhone Distribution: COMPANY (XXXXXXXXXX), OU=XXXXXXXXXX, O=COMPANY, C=US\n",
             "cn": "iPhone Distribution: COMPANY (XXXXXXXXXX)",
             "uid": "XXXXXXXXXX",
             "org": "COMPANY",
@@ -651,3 +652,4 @@ The output of this command looks like this:
 ## Requirements
 
 * OS: OS X (tested on 10.10 Yosemite) or Linux (tested on Ubuntu LTS 15.04)
+* OpenSSL: version 1.0.2g (1 Mar 2016) or greater
