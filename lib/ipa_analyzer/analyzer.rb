@@ -2,6 +2,7 @@ require 'tempfile'
 require 'zip'
 require 'zip/filesystem'
 require 'cfpropertylist'
+require 'pathname'
 
 module IpaAnalyzer
   class Analyzer
@@ -213,12 +214,20 @@ module IpaAnalyzer
     def collect_entitlements_info_with_path(path)
       raise 'IPA is not open' unless open?
 
+      fwk_name = Pathname(path).split.last.to_s.split('.')[0]
       result = nil
 
-      if !@ipa_zipfile.find_entry("#{path}Entitlements.plist").nil?
-        result = collect_info_plist_info_with_path("#{path}Entitlements.plist")
-      elsif !@ipa_zipfile.find_entry("#{path}archived-expanded-entitlements.xcent").nil?
-        result = collect_info_plist_info_with_path("#{path}archived-expanded-entitlements.xcent")
+      possible_ent_files = [
+        "#{path}Entitlements.plist",
+        "#{path}archived-expanded-entitlements.xcent"
+      ]
+
+      possible_ent_files.push("#{path}#{fwk_name}.entitlements") unless fwk_name.nil?
+
+      result = nil
+      possible_ent_files.each do |ent_file|
+        next if !result.nil? || @ipa_zipfile.find_entry(ent_file).nil?
+        result = collect_info_plist_info_with_path(ent_file)
       end
 
       result
