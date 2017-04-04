@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.summary     = 'iOS .ipa analyzer'
   s.description = 'Analyze an iOS .ipa file. Can be used as a CLI and can print the information in JSON so it can be used by other tools.'
 
-  s.add_runtime_dependency 'rubyzip', '~> 1.1.7', '>= 1.1.7'
+  s.add_runtime_dependency 'rubyzip', '~> 1.2'
   s.add_runtime_dependency 'CFPropertyList'
 
   s.add_development_dependency 'rspec'

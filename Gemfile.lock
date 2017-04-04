@@ -3,12 +3,12 @@ PATH
   specs:
     ipa_analyzer (0.1.1)
       CFPropertyList
-      rubyzip (~> 1.1.7, >= 1.1.7)
+      rubyzip (~> 1.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    CFPropertyList (2.2.8)
+    CFPropertyList (2.3.5)
     diff-lcs (1.2.5)
     rake (10.4.2)
     rspec (3.2.0)
@@ -24,7 +24,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.2.0)
     rspec-support (3.2.1)
-    rubyzip (1.1.7)
+    rubyzip (1.2.1)
 
 PLATFORMS
   ruby

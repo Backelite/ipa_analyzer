@@ -30,3 +30,10 @@ Gemfile.lock
 
 #IPA FILES
 *.ipa
+
+test_binaries\.sh
+
+*.log
+
+#RubyMine files
+\.idea/
