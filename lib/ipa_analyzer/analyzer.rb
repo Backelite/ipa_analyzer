@@ -230,6 +230,9 @@ module IpaAnalyzer
         result = collect_info_plist_info_with_path(ent_file)
       end
 
+      # Default to error message if no entitlements were found
+      result = { :content =>  { "error" => "Could not find an entitlements file" } } if result.nil?
+
       result
     end
 
@@ -260,7 +263,8 @@ module IpaAnalyzer
         }
         result[:info_plist] = collect_info_plist_info_with_path("#{fwk.name}Info.plist")[:content]
         result[:mobileprovision] = collect_provision_info_with_path(fwk.name)[:content]
-        result[:entitlements] = collect_entitlements_info_with_path(fwk.name)[:content]
+        watch_ext_entitlements_info = collect_entitlements_info_with_path(fwk.name)
+        result[:entitlements] = watch_ext_entitlements_info[:content] unless watch_ext_entitlements_info.nil?
         plugins = collect_app_extensions_info_from_path("#{fwk.name}PlugIns/", '.appex')
         result[:plugins].concat(plugins) if !plugins.nil?
         result_list.push(result)
@@ -276,7 +280,6 @@ module IpaAnalyzer
 
     private
 
-    #
     # Find the .app folder which contains both the "embedded.mobileprovision"
     #  and "Info.plist" files.
     def find_app_folder_in_ipa
